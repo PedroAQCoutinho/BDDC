@@ -10,7 +10,8 @@ The main data sources for use in Brazil are: (i) PRODES - the official data publ
 
 ### Absolute deforestation
 
-![absolute_deforestation](https://user-images.githubusercontent.com/30662095/166042982-609e0276-cd6c-4ebe-aa05-2b4a3747a5ed.png)
+![absolute_deforestation](https://user-images.githubusercontent.com/30662095/166060873-62d93ccd-8efa-4f93-8922-9e61ab4a8c61.png)
+
 
 ### Accumulated absolute deforestation
 
@@ -19,15 +20,24 @@ The main data sources for use in Brazil are: (i) PRODES - the official data publ
 
 #### Municipal deforestation density
 
-
+![deforest_density](https://user-images.githubusercontent.com/30662095/166060897-e707fe17-9aa6-402b-b13b-330cbc1b831c.png)
 
 ### Absolute difference (PRODES-MAPBIOMAS)
 
+![absolute_deforestation_diff](https://user-images.githubusercontent.com/30662095/166060912-1f972c7b-c3e8-4544-91c6-e6ddf9359a26.png)
 
 Removing deforestation > 15.000ha
+
+![absolute_deforestation_diff2](https://user-images.githubusercontent.com/30662095/166060923-2174b922-627e-4448-8547-53ebe3d8376f.png)
 
 
 ### Accumulated absolute difference (PRODES-MAPBIOMAS)  
 
+![accumulated_diff](https://user-images.githubusercontent.com/30662095/166060944-52bc8f1c-2c25-4086-a659-bb240bd48f97.png)
+
+
+### Mapbiomas deviation from PRODES
+
+??
 
 
