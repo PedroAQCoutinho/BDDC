@@ -10,8 +10,8 @@ rm(list = ls())
 # Installing packages and reading data----
 library(pacman)
 p_load(data.table, ggplot2, dplyr, ggpubr, forcats, reshape2, repr)
-dados <- fread("trunk/base_compilada.csv")
-atributos_municipios <- fread("trunk/atributos_municipios_bioma.csv")
+dados <- fread("data/municipal_deforestation_multiple_sources.csv")
+atributos_municipios <- fread("data/municipal_geo_aggregations.csv")
 colnames(atributos_municipios)[1] <- "cd_mun"
 
 dados <- dados %>%
@@ -58,7 +58,7 @@ totais <- dados %>%
 
 # Charts----
 # Deforestation totals----
-jpeg("desmatamento_totais.jpg", width = 1000, height = 500,)
+jpeg("images/desmatamento_totais.jpg", width = 1000, height = 500,)
 p1 <- ggplot(totais, aes(fct_reorder(fonte, -area_desm_1000ha), area_desm_1000ha))+
   geom_col(position = "dodge", width = 0.1, fill= "chartreuse4")+
   scale_y_continuous(limits = c(0,100000), breaks = rep(seq(0,100000,25000)))+
@@ -78,7 +78,7 @@ p1 <- ggplot(totais, aes(fct_reorder(fonte, -area_desm_1000ha), area_desm_1000ha
 dev.off()
 
 # Annual deforestation----
-jpeg("desmatamento_anual.jpg", width = 3000, height = 1500, res = 300)
+jpeg("images/desmatamento_anual.jpg", width = 3000, height = 1500, res = 300)
 p2 <- ggplot(brasil, aes(ano, area_desm_1000ha, fill = fonte))+
   geom_col(position = "dodge", width = 0.7)+
   scale_y_continuous(limits = c(0,10000), breaks = rep(seq(0,10000,1000)))+
@@ -106,7 +106,7 @@ bioma_CEAM <- filter(bioma, Bioma %in% c("Cerrado", "Amaz?nia"))
 bioma_resto <- filter(bioma, Bioma %in% c("Pampa", "Pantanal", "Mata Atl?ntica",
                                           "Caatinga"))
 
-jpeg("desmatamento_bioma_am_cer.jpg", width = 3000, height = 1500, res = 300)
+jpeg("images/desmatamento_bioma_am_cer.jpg", width = 3000, height = 1500, res = 300)
 p4 <- ggplot(bioma_CEAM, aes(ano, area_desm_1000ha, fill = fonte))+
   geom_col(position = "dodge", width = 0.8)+
   scale_y_continuous(limits = c(0,6000), breaks = rep(seq(0,6000,1000)))+
@@ -129,7 +129,7 @@ p4 <- ggplot(bioma_CEAM, aes(ano, area_desm_1000ha, fill = fonte))+
         strip.text = element_text(size = 14));p4
 dev.off()
 
-jpeg("desmatamento_bioma_resto.jpg", width = 3000, height = 1500, res = 300)
+jpeg("images/desmatamento_bioma_resto.jpg", width = 3000, height = 1500, res = 300)
 p4 <- ggplot(bioma_resto, aes(ano, area_desm_1000ha, fill = fonte))+
   geom_col(position = "dodge", width = 0.7)+
   scale_y_continuous(limits = c(0,1000), breaks = rep(seq(0,1000,200)))+
@@ -161,7 +161,7 @@ mapbiomas <- subset(dados, fonte == "MAPBIOMAS")
 #GLAD x PRODES
 wide <- merge(glad, prodes, by = c("ano", "cd_mun"))
 
-jpeg("prodes_glad.jpg", width = 3500, height = 1500,res = 300)
+jpeg("images/prodes_glad.jpg", width = 3500, height = 1500,res = 300)
 p7 <- ggplot(wide, aes(area_1000.x, area_1000.y, col = Bioma.x))+
   geom_point(alpha = 0.7)+
   geom_abline()+
@@ -189,7 +189,7 @@ dev.off()
 # PRODES x MAPBIOMAS
 wide <- merge(prodes, mapbiomas, by = c("ano", "cd_mun"))
 
-jpeg("prodes_mb.jpg", width = 3500, height = 1500, res = 300)
+jpeg("images/prodes_mb.jpg", width = 3500, height = 1500, res = 300)
 p7 <- ggplot(wide, aes(area_1000.x, area_1000.y, col = Bioma.x))+
   geom_point(alpha = 0.7)+
   geom_abline()+
@@ -217,7 +217,7 @@ dev.off()
 # GLAD x MAPBIOMAS
 wide <- merge(glad, mapbiomas, by = c("ano", "cd_mun"))
 
-jpeg("glad_mb.jpg", width = 3500, height = 1500, res = 300)
+jpeg("images/glad_mb.jpg", width = 3500, height = 1500, res = 300)
 p7 <- ggplot(wide, aes(area_1000.x, area_1000.y, col = Bioma.x))+
   geom_point(alpha = 0.7)+
   geom_abline()+
