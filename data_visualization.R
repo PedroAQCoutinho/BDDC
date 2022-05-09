@@ -12,7 +12,7 @@ options(scipen = 999)
 #load
 base.compilada <- read.csv2('data/municipal_deforestation_multiple_sources.csv')
 #load
-br.mun <- st_read('data/BR_Municipios_2021.shp')
+br.mun <- st_read('D:/dados_GPP/geo_adm/municipios/BR_Municipios_2021.shp')
 br.mun$CD_MUN <- as.numeric(br.mun$CD_MUN)
 #load
 br.estados <- st_read('data/BR_UF_2021.shp')
