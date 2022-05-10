@@ -2,6 +2,7 @@ library(sf)
 library(ggplot2)
 library(dplyr)
 library(viridis)
+library(rmarkdown)
 
 #set
 options(scipen = 999)
@@ -22,7 +23,7 @@ bbox.clip <- br.uf %>%
 
 br.uf.clip <- st_intersection(br.uf, bbox.clip)
 
-#get only prodes data for selecting top 15 municipalities with the largest defrestations areas acumulated
+#get only prodes data for selecting top 15 municipalities with the largest deforestation areas accumulated
 p1 <- database %>%
   filter(fonte == 'PRODES') %>%
   mutate(area_desmatada_ha=as.numeric(area_desmatada_ha),
@@ -38,10 +39,11 @@ p1 <- database %>%
   ggplot() +
   geom_sf(data = br.uf.clip, fill = NA)+
   geom_sf(aes(fill = area_desmatada_ha, geometry = geometry)) +
-  scale_fill_viridis('Deforested area (ha)\n(17.1% total)', option = 'G') ; p1
+  scale_fill_viridis('Deforested area (ha)\n(17.1% total)', option = 'G')+
+  theme_bw(); p1
 
-
-ggsave('images/top15_deforestation_map.png', plot = last_plot(),
+#save
+ggsave('images/top15_deforestation_map.png', plot = p1,
        units = 'in', dpi = 200, width = 30, height = 20, scale = 0.4)
 
 
@@ -58,7 +60,8 @@ top15.mun <- database %>%
          total = sum(area_desmatada_ha),
          paccum = accum/total) %>%
   slice(1:15) %>%
-  pull(CD_MUN)
+  pull(CD_MUN) ; top15.mun
+
 
 #filter and prepare to plot
 to.plot <- database %>%
@@ -70,18 +73,21 @@ to.plot <- database %>%
   filter((CD_MUN %in% top15.mun) & fonte == 'PRODES' & ano > 2001 & ano < 2021) %>%
   mutate(NM_MUN = paste0(NM_MUN, ' (', SIGLA, ')'))
 
-#plot
+#plot 
 p2 <- to.plot %>%   
   ggplot() +
   geom_line(aes(x = ano,
                 y = area_desmatada_ha,
                 colour = NM_MUN))+
   labs(y = 'Deforested area (ha)',
-       x = 'year',
-       colour = 'Municípios') ; p2
+       x = 'Year',
+       colour = 'Municipalities') ; p2
 
-ggsave('images/top15_deforestation_ts.png', plot = last_plot(),
+#save
+ggsave('images/top15_deforestation_ts.png', plot = p2,
        units = 'in', dpi = 200, width = 30, height = 20, scale = 0.4)
+
+
 
 #removing blue outlier cd_mun == 1507300
 #filter and prepare to plot
@@ -101,10 +107,10 @@ p3 <- to.plot %>%
                 y = area_desmatada_ha,
                 colour = NM_MUN))+
   labs(y = 'Deforested area (ha)',
-       x = 'year',
-       colour = 'Municípios') ; p3
+       x = 'Year',
+       colour = 'Municipalities') ; p3
 
-ggsave('images/top15_deforestation_ts_without_outlier.png', plot = last_plot(),
+ggsave('images/top15_deforestation_ts_without_outlier.png', plot = p3,
        units = 'in', dpi = 200, width = 30, height = 20, scale = 0.4)
 
 
@@ -126,7 +132,8 @@ write.csv2(to.plot, 'top15_deforestation.csv',row.names = F)
 
 
 
-
+#render html
+rmarkdown::render('top15_deforestation.R')
 
 
 
