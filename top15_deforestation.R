@@ -130,8 +130,6 @@ to.plot <- database %>%
 write.csv2(to.plot, 'top15_deforestation.csv',row.names = F)
 
 
-
-
 #render html
 rmarkdown::render('top15_deforestation.R')
 
