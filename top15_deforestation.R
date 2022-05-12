@@ -23,32 +23,81 @@ bbox.clip <- br.uf %>%
 
 br.uf.clip <- st_intersection(br.uf, bbox.clip)
 
-#get only prodes data for selecting top 15 municipalities with the largest deforestation areas accumulated
-p1 <- database %>%
+
+#get only prodes data and selects top 15 municipalities with the largest deforestation areas accumulated
+top15.accumulated.absolute.deforest <- database %>%
   filter(fonte == 'PRODES') %>%
+  filter(!ano %in% c('2001','2021')) %>%
   mutate(area_desmatada_ha=as.numeric(area_desmatada_ha),
          CD_MUN=as.character(cd_mun)) %>%
   group_by(CD_MUN) %>%
   summarise(area_desmatada_ha = sum(area_desmatada_ha, na.rm = T)) %>%
+  left_join(br.mun, by = c('CD_MUN'='CD_MUN')) %>%
   arrange(desc(area_desmatada_ha)) %>%
   mutate(accum = cumsum(area_desmatada_ha),
          total = sum(area_desmatada_ha),
          paccum = accum/total) %>%
   slice(1:15) %>%
-  left_join(br.mun, by = 'CD_MUN') %>%
-  ggplot() +
+  select(CD_MUN, NM_MUN, area_desmatada_ha, paccum, SIGLA, geometry);top15.accumulated.absolute.deforest
+
+#top 15 absolute accumulated deforest
+pa <- top15.accumulated.absolute.deforest %>%
+ggplot() +
   geom_sf(data = br.uf.clip, fill = NA)+
   geom_sf(aes(fill = area_desmatada_ha, geometry = geometry)) +
   scale_fill_viridis('Deforested area (ha)\n(17.1% total)', option = 'G')+
-  theme_bw(); p1
+  theme_bw(); pa
 
 #save
-ggsave('images/top15_deforestation_map.png', plot = p1,
+ggsave('images/top15_deforestation_map.png', plot = pa,
        units = 'in', dpi = 200, width = 30, height = 20, scale = 0.4)
 
 
 
-#select top 15 mun
+
+
+#get only prodes data and selects top 50 municipalities with the largest deforestation density
+top15.deforest.density <- database %>%
+  filter(fonte == 'PRODES') %>%
+  filter(!ano %in% c('2001','2021')) %>%
+  mutate(area_desmatada_ha=as.numeric(area_desmatada_ha),
+         CD_MUN=as.character(cd_mun)) %>%
+  group_by(CD_MUN) %>%
+  summarise(area_desmatada_ha = sum(area_desmatada_ha, na.rm = T)) %>%
+  left_join(br.mun , by = c('CD_MUN'='CD_MUN')) %>%
+  mutate(dens = area_desmatada_ha/(AREA_KM2*10000)) %>%
+  arrange(desc(dens)) %>%
+  slice(1:15)  %>%
+  select(CD_MUN, NM_MUN, area_desmatada_ha, dens, SIGLA, geometry); top15.deforest.density
+
+sum(top15.deforest.density$area_desmatada_ha)/(database %>%
+                                                    filter(fonte == 'PRODES') %>%
+                                                    filter(!ano %in% c('2001','2021')) %>%
+                                                    mutate(area_desmatada_ha=as.numeric(area_desmatada_ha)) %>%
+                                                  summarise(area_desmatada_ha = sum(area_desmatada_ha, na.rm = T)))
+
+#top 50 deforest density
+pb <- top15.deforest.density %>%
+  ggplot() +
+  geom_sf(data = br.uf.clip, fill = NA)+
+  geom_sf(aes(fill = dens, geometry = geometry)) +
+  scale_fill_viridis('Deforestation density (ha/10km²)\n(2.2% total)', option = 'D')+
+  theme_bw() ;pb
+
+#save
+ggsave('images/top15_deforestation_density_map.png', plot = pb,
+       units = 'in', dpi = 200, width = 30, height = 20, scale = 0.4)
+
+
+
+
+
+
+
+
+
+
+#select top 15 mun with largest deforestation accumulated area
 top15.mun <- database %>%
   filter(fonte == 'PRODES') %>%
   mutate(area_desmatada_ha=as.numeric(area_desmatada_ha),
@@ -63,7 +112,7 @@ top15.mun <- database %>%
   pull(CD_MUN) ; top15.mun
 
 
-#filter and prepare to plot
+#filter and prepare to plot lines
 to.plot <- database %>%
   left_join(br.mun %>% st_drop_geometry(), by = c('cd_mun'='cd_munc')) %>%
   mutate(CD_MUN=as.character(cd_mun),
@@ -128,6 +177,8 @@ to.plot <- database %>%
   mutate(NM_MUN = paste0(NM_MUN, ' (', SIGLA, ')'))
 
 write.csv2(to.plot, 'top15_deforestation.csv',row.names = F)
+
+
 
 
 #render html
